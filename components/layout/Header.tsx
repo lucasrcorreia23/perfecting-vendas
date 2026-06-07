@@ -55,11 +55,14 @@ export default function Header() {
         }`}
       >
         <div className="container grid h-16 grid-cols-[1fr_auto_1fr] items-center">
-          <a href="#top" className="justify-self-start text-xl font-black tracking-tight leading-none">
+          <a
+            href="#top"
+            className="col-start-1 justify-self-start text-xl font-black tracking-tight leading-none"
+          >
             <span className="text-primary">Perfecting</span>
           </a>
 
-          <nav className="hidden items-center justify-self-center gap-1 md:flex">
+          <nav className="col-start-2 hidden items-center justify-self-center gap-1 md:flex">
             {[
               {label: 'Para quem', href: '#para-quem'},
               {label: 'Como funciona', href: '#etapas'},
@@ -76,7 +79,9 @@ export default function Header() {
             ))}
           </nav>
 
-          <CtaButton className="!h-10 !px-5 justify-self-end">Agendar demonstração</CtaButton>
+          <CtaButton className="col-start-3 !h-10 !px-3 !text-[13px] justify-self-end whitespace-nowrap sm:!px-5 sm:!text-sm">
+            Agendar demonstração
+          </CtaButton>
         </div>
       </div>
     </header>

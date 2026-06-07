@@ -57,7 +57,9 @@ export default function PitchSection() {
               acompanhamento de perto da nossa equipe.
             </p>
             <div className="mt-8">
-              <CtaButton>Quero agendar minha demonstração</CtaButton>
+              <CtaButton className="!h-10 !px-2.5 !text-xs whitespace-nowrap sm:!px-7 sm:!text-sm">
+                Quero agendar minha demonstração
+              </CtaButton>
             </div>
           </div>
 
