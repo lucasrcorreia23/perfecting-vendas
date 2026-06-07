@@ -1,0 +1,271 @@
+@import 'tailwindcss';
+
+@layer base {
+  body {
+    font-family: var(--font-manrope), ui-sans-serif, system-ui, sans-serif;
+  }
+  h1, h2, h3, h4, h5, h6 {
+    @apply font-bold tracking-tight;
+  }
+}
+
+@utility container {
+  margin: 0 auto;
+  width: 100%;
+  max-width: 80rem; /* 1280px */
+  padding-left: 1.5rem;
+  padding-right: 1.5rem;
+}
+@media (min-width: 768px) {
+  .container {
+    padding-left: 2rem;
+    padding-right: 2rem;
+  }
+}
+
+@theme {
+  --font-sans: var(--font-manrope), ui-sans-serif, system-ui, sans-serif;
+
+  /* Fundos claros */
+  --color-parchment: #ffffff;
+  --color-parchment-mid: #f9f9f9;
+  --color-parchment-dark: #f4f4f2;
+  --color-parchment-darker: #ececea;
+  --color-parchment-text: #1e1c24;
+
+  --color-ink: #1e1c24;
+  --color-ink-soft: #2a2735;
+  --color-ink-muted: #3a3850;
+  --color-chalk: #edece8;
+  --color-chalk-muted: #7a778e;
+  --color-citrine: #c4a83a;
+
+  /* Marca */
+  --color-primary: #2e63cd;
+  --color-primary-hover: #1c4088;
+  --color-primary-glow: #6bb3ff;
+  --color-brand: #2e63cd;
+
+  --color-btn-secondary-border: rgba(0, 0, 0, 0.12);
+  --color-btn-secondary-border-dark: rgba(255, 255, 255, 0.2);
+
+  --color-bg: #ffffff;
+  --color-surface: #ffffff;
+  --color-text: #0c0b10;
+  --color-text-secondary: #3a3850;
+  --color-text-muted: #7a778e;
+  --color-border: rgba(0, 0, 0, 0.08);
+  --color-black: #0c0b10;
+  --color-white: #fff;
+
+  --shadow-card: 0 2px 24px rgba(0, 0, 0, 0.12);
+  --shadow-card-dark: 0 4px 32px rgba(0, 0, 0, 0.4);
+  --shadow-glow: 0 0 40px rgba(46, 99, 205, 0.25);
+  --shadow-layer: 0 35px 60px -15px rgba(0, 0, 0, 0.3);
+
+  /* Raios — `rounded-card` depende deste token (config JS não é lido em Tailwind v4) */
+  --radius-card: 12px;
+
+  --default-transition-duration: 250ms;
+}
+
+/* ------------------------------------------------------------------ */
+/* Botões                                                              */
+/* ------------------------------------------------------------------ */
+@property --btn-primary-angle {
+  syntax: '<angle>';
+  initial-value: 167deg;
+  inherits: false;
+}
+
+.btn-primary {
+  --btn-primary-angle: 167deg;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  background: linear-gradient(var(--btn-primary-angle, 135deg), var(--color-primary-glow) 0%, var(--color-primary) 50%, var(--color-primary-hover) 100%);
+  color: #fff;
+  text-decoration: none;
+  font-weight: 600;
+  border: 1px solid rgba(255, 255, 255, 0.4);
+  border-radius: 0.5rem;
+  box-shadow:
+    0 2px 12px rgba(46, 99, 205, 0.35),
+    0 0 0 1px rgba(255, 255, 255, 0.08) inset;
+  transition: --btn-primary-angle 0.6s ease, box-shadow 0.25s ease, border-color 0.2s ease, transform 0.15s ease;
+}
+.btn-primary:hover {
+  --btn-primary-angle: 315deg;
+  color: #fff;
+  box-shadow:
+    0 8px 28px rgba(46, 99, 205, 0.5),
+    0 0 0 1px rgba(255, 255, 255, 0.15) inset;
+  border-color: rgba(255, 255, 255, 0.5);
+}
+.btn-primary:active {
+  transform: scale(0.98);
+}
+
+.btn-secondary {
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  background: #fff;
+  color: var(--color-parchment-text);
+  font-weight: 600;
+  text-decoration: none;
+  border: 1px solid var(--color-btn-secondary-border);
+  border-radius: 0.5rem;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.04);
+  transition: border-color 0.2s ease, background-color 0.2s ease, box-shadow 0.2s ease;
+}
+.btn-secondary:hover {
+  border-color: rgba(0, 0, 0, 0.2);
+  background: var(--color-parchment-mid);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+}
+
+/* Texto com gradiente da marca */
+.text-gradient-primary {
+  background: linear-gradient(170deg, var(--color-primary-glow) 0%, var(--color-primary) 50%, var(--color-primary-hover) 100%);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+}
+.text-gradient-stat {
+  background: linear-gradient(147deg, var(--color-primary-glow) 0%, var(--color-primary) 50%, var(--color-primary-hover) 100%);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+}
+
+/* ------------------------------------------------------------------ */
+/* Inputs                                                              */
+/* ------------------------------------------------------------------ */
+.input-field {
+  appearance: none;
+  -webkit-appearance: none;
+  width: 100%;
+  font: inherit;
+  font-size: 0.9375rem;
+  line-height: 1.4;
+  color: var(--color-parchment-text);
+  background: var(--color-parchment);
+  border: 1px solid var(--color-btn-secondary-border);
+  border-radius: 0.5rem;
+  padding: 0.7rem 1rem;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.04);
+  transition: border-color 0.2s ease, box-shadow 0.2s ease, background-color 0.2s ease;
+}
+.input-field::placeholder {
+  color: var(--color-chalk-muted);
+}
+.input-field:hover {
+  border-color: rgba(0, 0, 0, 0.18);
+}
+.input-field:focus {
+  outline: none;
+  border-color: var(--color-primary);
+  box-shadow: 0 0 0 3px rgba(46, 99, 205, 0.15);
+}
+.label-field {
+  font-size: 0.875rem;
+  font-weight: 500;
+  color: rgba(30, 28, 36, 0.75);
+  margin-bottom: 0.25rem;
+  display: block;
+}
+
+/* ------------------------------------------------------------------ */
+/* Grain overlay                                                       */
+/* ------------------------------------------------------------------ */
+.grain::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='300' height='300'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='300' height='300' filter='url(%23n)' opacity='1'/%3E%3C/svg%3E");
+  background-repeat: repeat;
+  background-size: 200px 200px;
+  opacity: 0.04;
+  pointer-events: none;
+  z-index: 1;
+  mix-blend-mode: overlay;
+}
+
+/* ------------------------------------------------------------------ */
+/* Tipografia utilitária — todos os títulos em Manrope (font-sans)     */
+/* ------------------------------------------------------------------ */
+.text-display {
+  font-family: var(--font-sans);
+  font-size: clamp(40px, 5vw, 88px);
+  line-height: 1.02;
+  letter-spacing: -0.03em;
+  font-weight: 800;
+}
+.text-display-sm {
+  font-family: var(--font-sans);
+  font-size: clamp(32px, 4.5vw, 52px);
+  line-height: 1.08;
+  letter-spacing: -0.025em;
+  font-weight: 800;
+}
+.text-stat {
+  font-family: var(--font-sans);
+  font-size: clamp(2.25rem, 6vw, 3.75rem);
+  line-height: 1;
+  letter-spacing: -0.03em;
+  font-weight: 700;
+}
+
+/* ------------------------------------------------------------------ */
+/* Fallback de animação (reduced-motion / antes do GSAP)              */
+/* ------------------------------------------------------------------ */
+@keyframes fadeUp {
+  from { opacity: 0; transform: translateY(28px); }
+  to   { opacity: 1; transform: none; }
+}
+@media (prefers-reduced-motion: reduce) {
+  /* Garante visibilidade total sem JS de animação */
+  [data-anim] { opacity: 1 !important; transform: none !important; }
+}
+
+/* ------------------------------------------------------------------ */
+/* Modal WhatsApp                                                      */
+/* ------------------------------------------------------------------ */
+dialog#whatsapp-modal {
+  margin: auto;
+  border: none;
+  padding: 0;
+  background: transparent;
+  max-height: 92vh;
+}
+dialog#whatsapp-modal::backdrop {
+  background: rgba(12, 11, 18, 0.5);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+}
+@keyframes modal-fade-in {
+  from { opacity: 0; transform: translateY(16px) scale(0.965); }
+  to   { opacity: 1; transform: translateY(0) scale(1); }
+}
+@keyframes backdrop-fade-in {
+  from { opacity: 0; }
+  to   { opacity: 1; }
+}
+@keyframes modal-fade-out {
+  from { opacity: 1; transform: translateY(0) scale(1); }
+  to   { opacity: 0; transform: translateY(10px) scale(0.975); }
+}
+@media (prefers-reduced-motion: no-preference) {
+  dialog#whatsapp-modal[open]:not(.is-closing) > div {
+    animation: modal-fade-in 0.5s cubic-bezier(0.16, 1, 0.3, 1) both;
+  }
+  dialog#whatsapp-modal[open]:not(.is-closing)::backdrop {
+    animation: backdrop-fade-in 0.4s ease both;
+  }
+  dialog#whatsapp-modal[open].is-closing > div {
+    animation: modal-fade-out 0.32s cubic-bezier(0.4, 0, 0.2, 1) both;
+  }
+}
