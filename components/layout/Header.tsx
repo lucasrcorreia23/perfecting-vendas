@@ -65,8 +65,8 @@ export default function Header() {
           <nav className="col-start-2 hidden items-center justify-self-center gap-1 md:flex">
             {[
               {label: 'Para quem', href: '#para-quem'},
-              {label: 'Como funciona', href: '#etapas'},
               {label: 'A plataforma', href: '#plataforma'},
+              {label: 'Como funciona', href: '#etapas'},
               {label: 'FAQ', href: '#faq'},
             ].map((item) => (
               <a
