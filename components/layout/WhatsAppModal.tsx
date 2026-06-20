@@ -1,7 +1,8 @@
 'use client'
 
 import {useCallback, useEffect, useRef, useState} from 'react'
-import {buildWhatsAppUrl} from '@/lib/whatsapp'
+import {isLeadFormComplete, trackLead} from '@/lib/meta-pixel'
+import {submitLead} from '@/lib/submit-lead'
 
 const CLOSE_MS = 320
 
@@ -15,7 +16,7 @@ function formatPhone(value: string): string {
 
 export const WHATSAPP_MODAL_ID = 'whatsapp-modal'
 
-/** Abre o modal de qualquer lugar (usado pelo CtaButton). */
+/** Abre o modal de demonstração (usado pelo CtaButton). */
 export function openWhatsAppModal() {
   const dialog = document.getElementById(WHATSAPP_MODAL_ID) as HTMLDialogElement | null
   if (dialog && !dialog.open) dialog.showModal()
@@ -27,6 +28,8 @@ export default function WhatsAppModal() {
   const [company, setCompany] = useState('')
   const [phone, setPhone] = useState('')
   const [sent, setSent] = useState(false)
+  const [submitting, setSubmitting] = useState(false)
+  const [error, setError] = useState('')
 
   const closeGracefully = useCallback(() => {
     const dialog = dialogRef.current
@@ -46,7 +49,14 @@ export default function WhatsAppModal() {
   useEffect(() => {
     const dialog = dialogRef.current
     if (!dialog) return
-    const onClose = () => setTimeout(() => setSent(false), 200)
+    const onClose = () =>
+      setTimeout(() => {
+        setSent(false)
+        setError('')
+        setName('')
+        setCompany('')
+        setPhone('')
+      }, 200)
     dialog.addEventListener('close', onClose)
     return () => dialog.removeEventListener('close', onClose)
   }, [])
@@ -59,11 +69,22 @@ export default function WhatsAppModal() {
   )
 
   const handleSubmit = useCallback(
-    (e: React.FormEvent<HTMLFormElement>) => {
+    async (e: React.FormEvent<HTMLFormElement>) => {
       e.preventDefault()
-      const url = buildWhatsAppUrl({name, company, phone})
-      window.open(url, '_blank', 'noopener,noreferrer')
-      setSent(true)
+      setError('')
+
+      if (!isLeadFormComplete(name, company, phone)) return
+
+      setSubmitting(true)
+      try {
+        await submitLead({name, company, phone})
+        trackLead()
+        setSent(true)
+      } catch {
+        setError('Não foi possível enviar agora. Tente novamente em instantes.')
+      } finally {
+        setSubmitting(false)
+      }
     },
     [name, company, phone],
   )
@@ -83,7 +104,7 @@ export default function WhatsAppModal() {
               Agendar demonstração
             </h2>
             <p className="mt-0.5 text-sm font-normal text-parchment-text/60">
-              Continuamos a conversa pelo WhatsApp
+              Preencha seus dados e nossa equipe entra em contato
             </p>
           </div>
           <button
@@ -102,19 +123,18 @@ export default function WhatsAppModal() {
         <div className="px-6 py-5">
           {sent ? (
             <div className="py-6 text-center">
-              <div className="mb-3 text-4xl">💬</div>
-              <p className="text-lg font-semibold text-parchment-text">Abrimos o WhatsApp pra você!</p>
+              <div className="mb-3 text-4xl">✓</div>
+              <p className="text-lg font-semibold text-parchment-text">Solicitação enviada!</p>
               <p className="mt-1 text-sm text-parchment-text/60">
-                Se nada abriu, fale agora pelo botão abaixo.
+                Recebemos seus dados. Em breve nossa equipe entra em contato para agendar a demonstração.
               </p>
-              <a
-                href={buildWhatsAppUrl({name, company, phone})}
-                target="_blank"
-                rel="noopener noreferrer"
+              <button
+                type="button"
+                onClick={closeGracefully}
                 className="btn-primary mt-5 h-11 w-full px-6 text-sm"
               >
-                Abrir WhatsApp
-              </a>
+                Fechar
+              </button>
             </div>
           ) : (
             <form onSubmit={handleSubmit} className="flex flex-col gap-4">
@@ -130,6 +150,7 @@ export default function WhatsAppModal() {
                   autoComplete="name"
                   placeholder="Seu nome"
                   className="input-field"
+                  disabled={submitting}
                 />
               </div>
 
@@ -145,6 +166,7 @@ export default function WhatsAppModal() {
                   autoComplete="organization"
                   placeholder="Nome da empresa"
                   className="input-field"
+                  disabled={submitting}
                 />
               </div>
 
@@ -161,21 +183,23 @@ export default function WhatsAppModal() {
                   autoComplete="tel"
                   placeholder="(11) 99999-9999"
                   className="input-field"
+                  disabled={submitting}
                 />
               </div>
 
-              <button type="submit" className="btn-primary mt-1 h-12 px-6 text-sm">
-                Continuar no WhatsApp
-              </button>
+              {error ? (
+                <p className="text-sm text-red-600" role="alert">
+                  {error}
+                </p>
+              ) : null}
 
-              <a
-                href={buildWhatsAppUrl()}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="text-center text-sm font-medium text-primary hover:underline"
+              <button
+                type="submit"
+                disabled={submitting}
+                className="btn-primary mt-1 h-12 px-6 text-sm disabled:cursor-not-allowed disabled:opacity-60"
               >
-                Prefiro falar agora, sem preencher
-              </a>
+                {submitting ? 'Enviando...' : 'Solicitar demonstração'}
+              </button>
             </form>
           )}
         </div>

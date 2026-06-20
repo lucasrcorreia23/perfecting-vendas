@@ -9,7 +9,7 @@ interface CtaButtonProps {
 }
 
 /**
- * CTA padrão da página. Abre o modal de WhatsApp (renderizado uma vez no layout).
+ * CTA padrão da página. Abre o modal de demonstração (renderizado uma vez no layout).
  * variant "light" = botão branco para usar sobre fundos azuis (CTA final/seções).
  */
 export default function CtaButton({

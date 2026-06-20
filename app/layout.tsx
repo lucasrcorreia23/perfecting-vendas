@@ -3,6 +3,7 @@ import './globals.css'
 import type {Metadata, Viewport} from 'next'
 import {Manrope} from 'next/font/google'
 
+import MetaPixel from '@/components/analytics/MetaPixel'
 import Header from '@/components/layout/Header'
 import Footer from '@/components/layout/Footer'
 import WhatsAppModal from '@/components/layout/WhatsAppModal'
@@ -41,6 +42,7 @@ export default function RootLayout({children}: {children: React.ReactNode}) {
   return (
     <html lang="pt-BR" className={manrope.variable} suppressHydrationWarning>
       <body className="bg-parchment font-sans text-parchment-text antialiased">
+        <MetaPixel />
         <Header />
         <SmoothScrollProvider>
           <main id="top">{children}</main>
