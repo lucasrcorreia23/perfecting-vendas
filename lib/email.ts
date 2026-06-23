@@ -1,9 +1,12 @@
 import {Resend} from 'resend'
 
+import type {UtmParams} from '@/lib/utm'
+
 export interface LeadPayload {
   name: string
   company: string
   phone: string
+  utm?: UtmParams
 }
 
 function getResendClient() {
@@ -12,7 +15,7 @@ function getResendClient() {
   return new Resend(apiKey)
 }
 
-function formatSubmittedAt(date: Date): string {
+export function formatSubmittedAt(date: Date): string {
   return new Intl.DateTimeFormat('pt-BR', {
     dateStyle: 'short',
     timeStyle: 'short',
@@ -26,6 +29,8 @@ export async function sendLeadNotification(lead: LeadPayload): Promise<void> {
   const resend = getResendClient()
   const submittedAt = formatSubmittedAt(new Date())
 
+  const origin = formatOrigin(lead.utm)
+
   const text = [
     'Novo lead — LP Vendas Perfecting',
     '',
@@ -33,6 +38,7 @@ export async function sendLeadNotification(lead: LeadPayload): Promise<void> {
     `Empresa: ${lead.company}`,
     `WhatsApp: ${lead.phone}`,
     `Enviado em: ${submittedAt}`,
+    `Origem: ${origin.text}`,
   ].join('\n')
 
   const {error} = await resend.emails.send({
@@ -46,10 +52,29 @@ export async function sendLeadNotification(lead: LeadPayload): Promise<void> {
       <p><strong>Empresa:</strong> ${escapeHtml(lead.company)}</p>
       <p><strong>WhatsApp:</strong> ${escapeHtml(lead.phone)}</p>
       <p><strong>Enviado em:</strong> ${escapeHtml(submittedAt)}</p>
+      <p><strong>Origem:</strong> ${escapeHtml(origin.text)}</p>
     `.trim(),
   })
 
   if (error) throw new Error(error.message)
+}
+
+function formatOrigin(utm?: UtmParams): {text: string} {
+  if (!utm) return {text: 'direto / não informado'}
+
+  const parts: string[] = []
+  if (utm.source) parts.push(`source: ${utm.source}`)
+  if (utm.medium) parts.push(`medium: ${utm.medium}`)
+  if (utm.campaign) parts.push(`campaign: ${utm.campaign}`)
+  if (utm.term) parts.push(`term: ${utm.term}`)
+  if (utm.content) parts.push(`content: ${utm.content}`)
+
+  if (parts.length === 0) {
+    const fallback = utm.referrer || utm.landingPath
+    return {text: fallback ? `direto (${fallback})` : 'direto / não informado'}
+  }
+
+  return {text: parts.join(' · ')}
 }
 
 function escapeHtml(value: string): string {

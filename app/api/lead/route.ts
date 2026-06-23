@@ -1,7 +1,32 @@
 import {NextResponse} from 'next/server'
 
-import {sendLeadNotification} from '@/lib/email'
+import {formatSubmittedAt, sendLeadNotification} from '@/lib/email'
 import {isLeadFormComplete} from '@/lib/meta-pixel'
+import {appendLeadToSheet} from '@/lib/sheets'
+import type {UtmParams} from '@/lib/utm'
+
+const UTM_FIELDS = [
+  'source',
+  'medium',
+  'campaign',
+  'term',
+  'content',
+  'referrer',
+  'landingPath',
+] as const
+
+function sanitizeUtm(value: unknown): UtmParams | undefined {
+  if (!value || typeof value !== 'object') return undefined
+  const input = value as Record<string, unknown>
+  const utm: UtmParams = {}
+  for (const field of UTM_FIELDS) {
+    const raw = input[field]
+    if (typeof raw === 'string' && raw.trim()) {
+      utm[field] = raw.trim().slice(0, 500)
+    }
+  }
+  return Object.keys(utm).length > 0 ? utm : undefined
+}
 
 export async function POST(request: Request) {
   let body: unknown
@@ -16,7 +41,7 @@ export async function POST(request: Request) {
     return NextResponse.json({error: 'Invalid payload'}, {status: 400})
   }
 
-  const {name, company, phone} = body as Record<string, unknown>
+  const {name, company, phone, utm} = body as Record<string, unknown>
 
   if (
     typeof name !== 'string' ||
@@ -27,12 +52,23 @@ export async function POST(request: Request) {
     return NextResponse.json({error: 'Invalid lead data'}, {status: 400})
   }
 
-  try {
-    await sendLeadNotification({
-      name: name.trim(),
-      company: company.trim(),
-      phone: phone.trim(),
+  const lead = {
+    name: name.trim(),
+    company: company.trim(),
+    phone: phone.trim(),
+    utm: sanitizeUtm(utm),
+  }
+  const submittedAt = formatSubmittedAt(new Date())
+
+  // A planilha é best-effort: não deve impedir a notificação por e-mail.
+  if (process.env.SHEETS_WEBHOOK_URL) {
+    void appendLeadToSheet(lead, submittedAt).catch((error) => {
+      console.error('[api/lead] sheets', error)
     })
+  }
+
+  try {
+    await sendLeadNotification(lead)
     return NextResponse.json({ok: true})
   } catch (error) {
     console.error('[api/lead]', error)

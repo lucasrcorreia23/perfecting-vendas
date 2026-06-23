@@ -3,6 +3,7 @@
 import {useCallback, useEffect, useRef, useState} from 'react'
 import {isLeadFormComplete, trackLead} from '@/lib/meta-pixel'
 import {submitLead} from '@/lib/submit-lead'
+import {getUtmParams} from '@/lib/utm'
 
 const CLOSE_MS = 320
 
@@ -77,7 +78,7 @@ export default function WhatsAppModal() {
 
       setSubmitting(true)
       try {
-        await submitLead({name, company, phone})
+        await submitLead({name, company, phone, utm: getUtmParams()})
         trackLead()
         setSent(true)
       } catch {
